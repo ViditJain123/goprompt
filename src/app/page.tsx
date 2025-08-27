@@ -225,56 +225,7 @@ function HomeContent() {
     }
   };
 
-  const generateHTML = () => {
-    const buttonStyle = `
-      background-color: ${config.backgroundColor};
-      color: ${config.textColor};
-      font-size: ${config.fontSize}px;
-      padding: ${config.padding}px ${config.padding * 2}px;
-      border-radius: ${config.borderRadius}px;
-      border: ${config.borderWidth}px solid ${config.borderColor};
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      font-family: Arial, sans-serif;
-      transition: all 0.2s ease;
-    `;
 
-    const searchParams = config.enableSearch ? 'hints=search' : '';
-    
-    // Handle prompt encoding based on AI provider
-    let promptParams = '';
-    if (config.customPrompt) {
-      if (config.aiProvider === 'chatgpt') {
-        // ChatGPT encoding: use proper URL encoding to preserve newlines
-        promptParams = `prompt=${encodeURIComponent(config.customPrompt)}`;
-      } else {
-        // Claude encoding: use proper URL encoding with q parameter (preserves newlines)
-        promptParams = `q=${encodeURIComponent(config.customPrompt)}`;
-      }
-    }
-    
-    const params = [searchParams, promptParams].filter(Boolean).join('&');
-    
-    let url = '';
-    if (config.aiProvider === 'chatgpt') {
-      url = params ? `https://chatgpt.com?${params}` : 'https://chatgpt.com';
-    } else {
-      url = params ? `https://claude.ai/new?${params}` : 'https://claude.ai/new';
-    }
-
-    // Add positioning wrapper based on selected position
-    let wrapperStyle = '';
-    if (config.position === 'center') {
-      wrapperStyle = 'text-align: center;';
-    } else if (config.position === 'right') {
-      wrapperStyle = 'text-align: right;';
-    } else {
-      wrapperStyle = 'text-align: left;';
-    }
-
-    return `<div style="${wrapperStyle}"><a href="${url}" style="${buttonStyle}">${config.text}</a></div>`;
-  };
 
   const copyToClipboard = async () => {
     try {
@@ -452,12 +403,12 @@ function HomeContent() {
                   </button>
                   <button
                     onClick={copyToClipboard}
-                    disabled={userLoading || (!isAuthenticated || (user && user.subscription.plan === 'free'))}
+                    disabled={userLoading || !isAuthenticated || (user?.subscription?.plan === 'free')}
                     className={clsx(
                       "px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2",
                       copied
                         ? "bg-green-500 text-white shadow-lg"
-                        : userLoading || (!isAuthenticated || (user && user.subscription.plan === 'free'))
+                        : userLoading || !isAuthenticated || (user?.subscription?.plan === 'free')
                         ? "bg-gray-400 text-gray-600 cursor-not-allowed shadow-md"
                         : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     )}
