@@ -69,14 +69,15 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-200 px-8 py-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <Image 
               src="/logo.png" 
               alt="The Prompt Button" 
-              width={120} 
-              height={40} 
-              className="h-8 w-auto"
+              width={140} 
+              height={140} 
+              className="h-12 w-auto"
             />
+            <span className="text-2xl font-bold text-gray-900">Go Prompt</span>
           </Link>
         </div>
         
