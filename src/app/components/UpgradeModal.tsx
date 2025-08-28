@@ -174,19 +174,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               }
             </p>
             
-            {/* Current subscription info */}
-            {userData && currentPlan !== 'free' && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-blue-800 text-sm">
-                  You have {userData.subscription.maxButtons === -1 ? 'unlimited' : userData.subscription.maxButtons} buttons available
-                  {userData.subscription.daysUntilExpiry && (
-                    <span className={`ml-2 ${userData.subscription.daysUntilExpiry <= 7 ? 'text-orange-600 font-medium' : ''}`}>
-                      • Expires in {userData.subscription.daysUntilExpiry} days
-                    </span>
-                  )}
-                </p>
-              </div>
-            )}
+
 
             {/* Expiring warning */}
             {isExpiring && (

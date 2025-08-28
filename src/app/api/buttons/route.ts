@@ -78,14 +78,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Check if user can create more buttons
-    if (!user.canCreateButton()) {
-      return NextResponse.json({ 
-        error: 'Button limit reached. Please upgrade your subscription to create more buttons.',
-        currentCount: user.buttonCount,
-        maxButtons: user.maxButtons
-      }, { status: 403 });
-    }
+    // Button limits removed - unlimited button creation for all users
 
     const body = await request.json();
     const { 

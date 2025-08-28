@@ -178,8 +178,7 @@ export function useUser() {
   };
 
   const canCreateButton = () => {
-    if (!userData) return false;
-    return userData.buttonCount < userData.maxButtons;
+    return true; // Unlimited button creation for all users
   };
 
   const getSubscriptionLimits = () => {

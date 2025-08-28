@@ -54,7 +54,7 @@ function HomeContent() {
   });
 
   const [copied, setCopied] = useState(false);
-  const [showPresets, setShowPresets] = useState(false);
+  const [showPresets, setShowPresets] = useState(true);
 
   useEffect(() => {
     const payment = searchParams.get('payment');

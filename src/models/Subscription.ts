@@ -167,17 +167,17 @@ SubscriptionSchema.methods.canUpgradeTo = function(targetPlan: SubscriptionPlan)
 SubscriptionSchema.methods.getFeatures = function() {
   const features = {
     free: {
-      maxButtons: 5,
+      maxButtons: -1, // unlimited
       features: ['basic_button_generation'],
       priority: 'low',
     },
     monthly: {
-      maxButtons: 100,
+      maxButtons: -1, // unlimited
       features: ['basic_button_generation', 'custom_prompts', 'analytics', 'priority_support'],
       priority: 'high',
     },
     yearly: {
-      maxButtons: 500,
+      maxButtons: -1, // unlimited
       features: ['basic_button_generation', 'custom_prompts', 'analytics', 'priority_support', 'advanced_analytics', 'custom_branding'],
       priority: 'high',
     },

@@ -53,19 +53,7 @@ export default clerkMiddleware(async (auth, req) => {
               }, { status: 402 }); // 402 Payment Required
             }
 
-            // Check button limits for button creation
-            if (req.nextUrl.pathname === '/api/buttons' && req.method === 'POST') {
-              const canCreate = await user.canCreateButton();
-              if (!canCreate) {
-                return NextResponse.json({
-                  error: 'Button limit reached',
-                  details: `You have reached your button limit of ${subscriptionDetails.maxButtons}. Please upgrade your plan to create more buttons.`,
-                  currentCount: user.buttonCount,
-                  maxButtons: subscriptionDetails.maxButtons,
-                  plan: subscriptionDetails.plan,
-                }, { status: 402 }); // 402 Payment Required
-              }
-            }
+            // Button limits removed - unlimited button creation for all users
 
             // Add subscription info to headers for API routes
             const response = NextResponse.next();

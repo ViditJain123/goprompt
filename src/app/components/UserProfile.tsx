@@ -157,22 +157,14 @@ export default function UserProfile() {
             {/* Account Statistics */}
             <div className="bg-gray-50 rounded-lg p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Statistics</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
                   <div className="text-2xl font-bold text-blue-600">{user.buttonCount}</div>
-                  <div className="text-sm text-gray-600">Total Buttons</div>
+                  <div className="text-sm text-gray-600">Total Buttons Created</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="text-2xl font-bold text-green-600">
-                    {Math.round((user.buttonCount / user.maxButtons) * 100)}%
-                  </div>
-                  <div className="text-sm text-gray-600">Storage Used</div>
-                </div>
-                <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="text-2xl font-bold text-purple-600">
-                    {user.maxButtons - user.buttonCount}
-                  </div>
-                  <div className="text-sm text-gray-600">Remaining</div>
+                  <div className="text-2xl font-bold text-green-600">∞</div>
+                  <div className="text-sm text-gray-600">Button Limit</div>
                 </div>
               </div>
             </div>

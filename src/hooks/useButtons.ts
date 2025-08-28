@@ -249,8 +249,8 @@ export function useButtons() {
     updateButton,
     deleteButton,
     duplicateButton,
-    canCreateMore: user ? user.buttonCount < user.maxButtons : false,
-    buttonLimit: user?.maxButtons || 0,
+    canCreateMore: true, // Unlimited button creation
+    buttonLimit: -1, // Unlimited
     currentCount: user?.buttonCount || 0,
   };
 }
