@@ -5,6 +5,7 @@ const isPublicRoute = createRouteMatcher([
   '/',
   '/api/users/subscription', // Allow subscription webhooks
   '/api/create-checkout', // Allow checkout creation
+  '/api/presets'
 ]);
 
 const isApiRoute = createRouteMatcher(['/api/(.*)']);

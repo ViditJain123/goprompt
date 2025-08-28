@@ -20,11 +20,13 @@ export async function GET(request: NextRequest) {
     
     switch (category) {
       case 'default':
+        // Default presets are always public - no auth required
         query = { category: 'default' };
         break;
       case 'custom':
+        // Custom presets require authentication
         if (!userId) {
-          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+          return NextResponse.json({ presets: [], pagination: { page, limit, total: 0, pages: 0 } });
         }
         // Find the user's MongoDB ObjectId from their Clerk ID
         const user = await User.findOne({ clerkId: userId });
@@ -34,10 +36,11 @@ export async function GET(request: NextRequest) {
         query = { category: 'custom', userId: user._id };
         break;
       case 'public':
+        // Public presets are always accessible - no auth required
         query = { isPublic: true };
         break;
       default:
-        // Get all: default presets + user's custom presets + public presets
+        // Get all: default presets + user's custom presets (if signed in) + public presets
         if (userId) {
           // Find the user's MongoDB ObjectId from their Clerk ID
           const userForAll = await User.findOne({ clerkId: userId });
@@ -58,6 +61,7 @@ export async function GET(request: NextRequest) {
             };
           }
         } else {
+          // Not signed in - only show default and public presets
           query = {
             $or: [
               { category: 'default' },
