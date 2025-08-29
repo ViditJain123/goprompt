@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
-  title: "ChatGPT Button Generator",
+  title: "Go Prompt!",
   description: "Create customizable HTML buttons that link to ChatGPT with custom prompts and search hints for newsletters, blogs, and websites without writing any code.",
   keywords: ["button generator", "newsletter", "HTML", "no-code", "web design", "chatgpt", "prompt"],
   icons: {
