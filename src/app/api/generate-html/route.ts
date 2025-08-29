@@ -3,6 +3,42 @@ import { auth } from '@clerk/nextjs/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 
+// Helper function to format prompt for ChatGPT to preserve structure
+function formatPromptForChatGPT(prompt: string): string {
+  if (!prompt) return prompt;
+  
+  // Split the prompt into lines and process each line
+  const lines = prompt.split('\n');
+  const formattedLines = lines.map((line, index) => {
+    const trimmedLine = line.trim();
+    
+    // Skip empty lines but preserve them
+    if (!trimmedLine) {
+      return '';
+    }
+    
+    // Check if line appears to be a heading (starts with number, bullet, or is all caps)
+    if (/^\d+\./.test(trimmedLine) || /^[-•*]/.test(trimmedLine)) {
+      // It's already formatted as a list item
+      return line;
+    } else if (trimmedLine === trimmedLine.toUpperCase() && trimmedLine.length > 3) {
+      // Likely a heading - make it bold
+      return `**${trimmedLine}**`;
+    } else if (index === 0 && lines.length > 1) {
+      // First line is likely a title/heading
+      return `**${trimmedLine}**`;
+    }
+    
+    // Regular line - preserve as is
+    return line;
+  });
+  
+  // Add instruction to preserve formatting
+  const preserveFormatInstruction = "\n\n[Please maintain the formatting and structure of this prompt when editing]";
+  
+  return formattedLines.join('\n') + preserveFormatInstruction;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
@@ -77,7 +113,9 @@ export async function POST(request: NextRequest) {
     let promptParams = '';
     if (customPrompt) {
       if (aiProvider === 'chatgpt') {
-        promptParams = `prompt=${encodeURIComponent(customPrompt)}`;
+        // Preserve text structure by adding formatting markers for ChatGPT
+        const formattedPrompt = formatPromptForChatGPT(customPrompt);
+        promptParams = `prompt=${encodeURIComponent(formattedPrompt)}`;
       } else {
         promptParams = `q=${encodeURIComponent(customPrompt)}`;
       }

@@ -348,8 +348,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             </p>
             <p>
               Questions? Contact us at{' '}
-              <a href="mailto:support@promptbutton.com" className="text-blue-600 hover:underline">
-                support@promptbutton.com
+              <a href="mailto:workwithvidit@gmail.com" className="text-blue-600 hover:underline">
+              workwithvidit@gmail.com
               </a>
             </p>
           </div>

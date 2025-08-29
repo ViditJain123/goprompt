@@ -171,6 +171,42 @@ ButtonSchema.methods.incrementUsage = function(): void {
   this.lastUsedAt = new Date();
 };
 
+// Method to format prompt for ChatGPT to preserve structure
+ButtonSchema.methods.formatPromptForChatGPT = function(prompt: string): string {
+  if (!prompt) return prompt;
+  
+  // Split the prompt into lines and process each line
+  const lines = prompt.split('\n');
+  const formattedLines = lines.map((line, index) => {
+    const trimmedLine = line.trim();
+    
+    // Skip empty lines but preserve them
+    if (!trimmedLine) {
+      return '';
+    }
+    
+    // Check if line appears to be a heading (starts with number, bullet, or is all caps)
+    if (/^\d+\./.test(trimmedLine) || /^[-•*]/.test(trimmedLine)) {
+      // It's already formatted as a list item
+      return line;
+    } else if (trimmedLine === trimmedLine.toUpperCase() && trimmedLine.length > 3) {
+      // Likely a heading - make it bold
+      return `**${trimmedLine}**`;
+    } else if (index === 0 && lines.length > 1) {
+      // First line is likely a title/heading
+      return `**${trimmedLine}**`;
+    }
+    
+    // Regular line - preserve as is
+    return line;
+  });
+  
+  // Add instruction to preserve formatting
+  const preserveFormatInstruction = "\n\n[Please maintain the formatting and structure of this prompt when editing]";
+  
+  return formattedLines.join('\n') + preserveFormatInstruction;
+};
+
 // Method to generate HTML code
 ButtonSchema.methods.generateHTML = function(): string {
   const buttonStyle = `
@@ -193,7 +229,9 @@ ButtonSchema.methods.generateHTML = function(): string {
   let promptParams = '';
   if (this.customPrompt) {
     if (this.aiProvider === 'chatgpt') {
-      promptParams = `prompt=${encodeURIComponent(this.customPrompt)}`;
+      // Preserve text structure by adding formatting markers for ChatGPT
+      const formattedPrompt = this.formatPromptForChatGPT(this.customPrompt);
+      promptParams = `prompt=${encodeURIComponent(formattedPrompt)}`;
     } else {
       promptParams = `q=${encodeURIComponent(this.customPrompt)}`;
     }

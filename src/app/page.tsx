@@ -26,6 +26,42 @@ interface ButtonConfig {
   aiProvider: 'chatgpt' | 'claude';
 }
 
+// Helper function to format prompt for ChatGPT to preserve structure
+function formatPromptForChatGPT(prompt: string): string {
+  if (!prompt) return prompt;
+  
+  // Split the prompt into lines and process each line
+  const lines = prompt.split('\n');
+  const formattedLines = lines.map((line, index) => {
+    const trimmedLine = line.trim();
+    
+    // Skip empty lines but preserve them
+    if (!trimmedLine) {
+      return '';
+    }
+    
+    // Check if line appears to be a heading (starts with number, bullet, or is all caps)
+    if (/^\d+\./.test(trimmedLine) || /^[-•*]/.test(trimmedLine)) {
+      // It's already formatted as a list item
+      return line;
+    } else if (trimmedLine === trimmedLine.toUpperCase() && trimmedLine.length > 3) {
+      // Likely a heading - make it bold
+      return `**${trimmedLine}**`;
+    } else if (index === 0 && lines.length > 1) {
+      // First line is likely a title/heading
+      return `**${trimmedLine}**`;
+    }
+    
+    // Regular line - preserve as is
+    return line;
+  });
+  
+  // Add instruction to preserve formatting
+  const preserveFormatInstruction = "\n\n[Please maintain the formatting and structure of this prompt when editing]";
+  
+  return formattedLines.join('\n') + preserveFormatInstruction;
+}
+
 function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -481,8 +517,9 @@ function HomeContent() {
                     let promptParams = '';
                     if (config.customPrompt) {
                       if (config.aiProvider === 'chatgpt') {
-                        // ChatGPT encoding: use proper URL encoding to preserve newlines
-                        promptParams = `prompt=${encodeURIComponent(config.customPrompt)}`;
+                        // ChatGPT encoding: use proper URL encoding and formatting to preserve structure
+                        const formattedPrompt = formatPromptForChatGPT(config.customPrompt);
+                        promptParams = `prompt=${encodeURIComponent(formattedPrompt)}`;
                       } else {
                         // Claude encoding: use proper URL encoding with q parameter (preserves newlines)
                         promptParams = `q=${encodeURIComponent(config.customPrompt)}`;
