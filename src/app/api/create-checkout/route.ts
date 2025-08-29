@@ -7,7 +7,7 @@ import { SubscriptionPlan } from '@/models/Subscription';
 
 const DODOPAYMENTS_API_KEY = process.env.DODOPAYMENT_API;
 const DODOPAYMENTS_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://test.dodopayments.com' 
+  ? 'https://live.dodopayments.com' 
   : 'https://test.dodopayments.com';
 
 // Product IDs from your DodoPayments dashboard - update these with your actual product IDs
