@@ -115,7 +115,7 @@ const details = await user.getSubscriptionDetails();
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
-DODOPAYMENT_API=your_dodopayments_api_key
+DODO_PAYMENTS_API_KEY=your_dodopayments_api_key
 DODOPAYMENTS_WEBHOOK_SECRET=your_webhook_secret
 CRON_SECRET=your_cron_job_secret
 ```

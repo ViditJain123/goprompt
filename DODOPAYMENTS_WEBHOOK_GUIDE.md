@@ -8,7 +8,7 @@ Add these to your `.env.local` file:
 
 ```bash
 # DodoPayments API Configuration
-DODOPAYMENT_API=your_dodo_api_key_here
+DODO_PAYMENTS_API_KEY=your_dodo_api_key_here
 DODOPAYMENTS_WEBHOOK_SECRET=your_webhook_signing_key_here
 
 # MongoDB Configuration

@@ -5,16 +5,16 @@ import User, { IUserModel } from '@/models/User';
 import { SubscriptionService } from '@/lib/subscriptionService';
 import { SubscriptionPlan } from '@/models/Subscription';
 
-const DODOPAYMENTS_API_KEY = process.env.DODOPAYMENT_API;
+const DODOPAYMENTS_API_KEY = process.env.DODO_PAYMENTS_API_KEY;
 const DODOPAYMENTS_BASE_URL = process.env.NODE_ENV === 'production' 
   ? 'https://live.dodopayments.com' 
-  : 'https://test.dodopayments.com';
+  : 'https://live.dodopayments.com';
 
 // Product IDs from your DodoPayments dashboard - update these with your actual product IDs
 const PRODUCT_IDS = {
-  monthly: 'pdt_kwbHw53PPUcSUCzDfQe5T',    // $50/month
-  yearly: 'pdt_AXwT4UhFdk72q1OZcNUEQ',     // $499/year
-  lifetime: 'pdt_hnt3YWGbWfP7525gLeCiQ'    // $1299 one-time
+  monthly: 'pdt_66SMxagtB07i5poARmr7h',    // $50/month
+  yearly: 'pdt_qQHw7WhQynP0UFg18BdAw',     // $499/year
+  lifetime: 'pdt_FkhLRFK3xnzL7SbcSCUBI'    // $1299 one-time
 } as const;
 
 export async function POST(request: NextRequest) {
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     // Prepare checkout session data according to DodoPayments API
     const checkoutData = {
-      // Product cart using the expected API format
+      // Product cart using the correct API format
       product_cart: [
         {
           product_id: productId,
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         name: userName || userEmail.split('@')[0]
       },
       
-      // Success and cancel URLs - DodoPayments will automatically append payment_id and status
+      // Return URL - DodoPayments will automatically append payment parameters
       return_url: `${request.nextUrl.origin}/?payment=success&plan=${planType}`,
       
       // Metadata for webhook processing
@@ -141,15 +141,12 @@ export async function POST(request: NextRequest) {
         source: 'subscription_upgrade',
         user_email: userEmail,
         timestamp: new Date().toISOString()
-      },
-      
-      // Mode for the checkout
-      mode: planType === 'lifetime' ? 'payment' : 'subscription'
+      }
     };
 
     console.log('Creating checkout with DodoPayments...', {
       productId,
-      mode: checkoutData.mode,
+      planType,
       baseUrl: DODOPAYMENTS_BASE_URL
     });
 

@@ -130,7 +130,7 @@ const checkoutData = {
 #### Environment Variables:
 ```bash
 # DodoPayments Configuration
-DODOPAYMENT_API=your_dodo_api_key_here
+DODO_PAYMENTS_API_KEY=your_dodo_api_key_here
 DODOPAYMENTS_WEBHOOK_SECRET=your_webhook_signing_key_here
 
 # Database
@@ -263,7 +263,7 @@ http://localhost:3000/?payment=success&status=active&subscription_id=sub_3hoXhd6
 ```bash
 # Check webhook delivery
 curl -X GET "https://test.dodopayments.com/webhooks" \
-  -H "Authorization: Bearer $DODOPAYMENT_API"
+  -H "Authorization: Bearer $DODO_PAYMENTS_API_KEY"
 
 # Test webhook endpoint
 curl -X GET "http://localhost:3000/api/webhooks/dodopayments"

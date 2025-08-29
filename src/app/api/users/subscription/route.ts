@@ -6,7 +6,7 @@ import { SubscriptionService } from '@/lib/subscriptionService';
 import { SubscriptionPlan } from '@/models/Subscription';
 
 // These constants are defined but not used in this file - they may be used in future webhook validation
-// const DODOPAYMENTS_API_KEY = process.env.DODOPAYMENT_API;
+// const DODOPAYMENTS_API_KEY = process.env.DODO_PAYMENTS_API_KEY;
 // const DODOPAYMENTS_BASE_URL = 'https://test.dodopayments.com';
 
 // Product ID to plan mapping
