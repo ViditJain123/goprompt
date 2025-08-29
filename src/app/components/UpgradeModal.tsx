@@ -343,9 +343,6 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
         {/* Footer */}
         <div className="px-6 pb-6">
           <div className="text-center text-sm text-gray-500">
-            <p className="mb-2">
-              All plans include a 30-day money-back guarantee
-            </p>
             <p>
               Questions? Contact us at{' '}
               <a href="mailto:workwithvidit@gmail.com" className="text-blue-600 hover:underline">
