@@ -202,9 +202,8 @@ ButtonSchema.methods.formatPromptForChatGPT = function(prompt: string): string {
   });
   
   // Add instruction to preserve formatting
-  const preserveFormatInstruction = "\n\n[Please maintain the formatting and structure of this prompt when editing]";
   
-  return formattedLines.join('\n') + preserveFormatInstruction;
+  return formattedLines.join('\n');
 };
 
 // Method to generate HTML code

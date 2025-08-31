@@ -57,9 +57,8 @@ function formatPromptForChatGPT(prompt: string): string {
   });
   
   // Add instruction to preserve formatting
-  const preserveFormatInstruction = "\n\n[Please maintain the formatting and structure of this prompt when editing]";
   
-  return formattedLines.join('\n') + preserveFormatInstruction;
+  return formattedLines.join('\n');
 }
 
 function HomeContent() {
