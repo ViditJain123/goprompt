@@ -33,10 +33,9 @@ function formatPromptForChatGPT(prompt: string): string {
     return line;
   });
   
-  // Add instruction to preserve formatting
-  const preserveFormatInstruction = "\n\n[Please maintain the formatting and structure of this prompt when editing]";
+
   
-  return formattedLines.join('\n') + preserveFormatInstruction;
+  return formattedLines.join('\n');
 }
 
 export async function POST(request: NextRequest) {
