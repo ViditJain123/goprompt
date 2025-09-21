@@ -2,10 +2,9 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Copy, Palette, Type, Settings, Bookmark, Lock, Zap } from 'lucide-react';
+import { Copy, Palette, Type, Settings, Bookmark } from 'lucide-react';
 import clsx from 'clsx';
 import PresetSelector from './components/PresetSelector';
-import { useUser } from '@/hooks/useUser';
 
 interface ButtonConfig {
   text: string;
@@ -56,19 +55,87 @@ function formatPromptForChatGPT(prompt: string): string {
     return line;
   });
   
-  // Add instruction to preserve formatting
-  
   return formattedLines.join('\n');
+}
+
+// Client-side HTML generation function
+function generateButtonHTML(config: ButtonConfig): string {
+  const {
+    text,
+    backgroundColor,
+    textColor,
+    fontSize,
+    padding,
+    borderRadius,
+    borderWidth,
+    borderColor,
+    enableSearch,
+    customPrompt,
+    shadowColor,
+    shadowBlur,
+    shadowOffsetX,
+    shadowOffsetY,
+    position,
+    aiProvider
+  } = config;
+
+  // Generate button style
+  const buttonStyle = `
+    background-color: ${backgroundColor};
+    color: ${textColor};
+    font-size: ${fontSize}px;
+    padding: ${padding}px ${padding * 2}px;
+    border-radius: ${borderRadius}px;
+    border: ${borderWidth}px solid ${borderColor};
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-family: Arial, sans-serif;
+    transition: all 0.2s ease;
+    box-shadow: ${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor};
+  `.replace(/\s+/g, ' ').trim();
+
+  const searchParams = enableSearch ? 'hints=search' : '';
+  
+  let promptParams = '';
+  if (customPrompt) {
+    if (aiProvider === 'chatgpt') {
+      // Preserve text structure by adding formatting markers for ChatGPT
+      const formattedPrompt = formatPromptForChatGPT(customPrompt);
+      promptParams = `prompt=${encodeURIComponent(formattedPrompt)}`;
+    } else {
+      promptParams = `q=${encodeURIComponent(customPrompt)}`;
+    }
+  }
+  
+  const params = [searchParams, promptParams].filter(Boolean).join('&');
+  
+  let url = '';
+  if (aiProvider === 'chatgpt') {
+    url = params ? `https://chatgpt.com?${params}` : 'https://chatgpt.com';
+  } else {
+    url = params ? `https://claude.ai/new?${params}` : 'https://claude.ai/new';
+  }
+
+  let wrapperStyle = '';
+  if (position === 'center') {
+    wrapperStyle = 'text-align: center;';
+  } else if (position === 'right') {
+    wrapperStyle = 'text-align: right;';
+  } else {
+    wrapperStyle = 'text-align: left;';
+  }
+
+  const htmlCode = `<div style="${wrapperStyle}"><a href="${url}" style="${buttonStyle}">${text}</a></div>`;
+  return htmlCode;
 }
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, isLoading: userLoading, isAuthenticated } = useUser();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [hasProcessedPayment, setHasProcessedPayment] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [config, setConfig] = useState<ButtonConfig>({
     text: 'Click me!',
     backgroundColor: '#3b82f6',
@@ -266,46 +333,12 @@ function HomeContent() {
     try {
       setCopyError(null);
       
-      // Check if user is authenticated
-      if (!isAuthenticated) {
-        setCopyError('Please sign in to copy HTML code');
-        return;
-      }
-
-      // Check if user data is loaded
-      if (userLoading || !user) {
-        setCopyError('Loading user data...');
-        return;
-      }
-
-      // If user is on free plan, show upgrade modal instead of copying
-      if (user.subscription.plan === 'free') {
-        setShowUpgradeModal(true);
-        return;
-      }
-
-      // Call secure API endpoint to generate HTML
-      const response = await fetch('/api/generate-html', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        await navigator.clipboard.writeText(data.htmlCode);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } else {
-        if (data.requiresUpgrade) {
-          setShowUpgradeModal(true);
-        } else {
-          setCopyError(data.error || 'Failed to generate HTML code');
-        }
-      }
+      // Generate HTML directly without subscription checks
+      const htmlCode = generateButtonHTML(config);
+      
+      await navigator.clipboard.writeText(htmlCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy: ', err);
       setCopyError('Failed to copy HTML code. Please try again.');
@@ -438,13 +471,11 @@ function HomeContent() {
                   </button>
                   <button
                     onClick={copyToClipboard}
-                    disabled={userLoading || !isAuthenticated || (user?.subscription?.plan === 'free')}
+                    disabled={false}
                     className={clsx(
                       "px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2",
                       copied
                         ? "bg-green-500 text-white shadow-lg"
-                        : userLoading || !isAuthenticated || (user?.subscription?.plan === 'free')
-                        ? "bg-gray-400 text-gray-600 cursor-not-allowed shadow-md"
                         : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     )}
                   >
@@ -452,21 +483,6 @@ function HomeContent() {
                       <>
                         <Copy className="w-4 h-4" />
                         Copied!
-                      </>
-                    ) : userLoading ? (
-                      <>
-                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-600 border-t-transparent" />
-                        Loading...
-                      </>
-                    ) : !isAuthenticated ? (
-                      <>
-                        <Lock className="w-4 h-4" />
-                        Sign In to Copy
-                      </>
-                    ) : user && user.subscription.plan === 'free' ? (
-                      <>
-                        <Lock className="w-4 h-4" />
-                        Upgrade to Copy
                       </>
                     ) : (
                       <>
@@ -898,55 +914,6 @@ function HomeContent() {
           </div>
         </div>
       </div>
-
-      {/* Upgrade Modal */}
-      {showUpgradeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Lock className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Upgrade Required</h3>
-                <p className="text-sm text-gray-600">Copy feature is not available on the free plan</p>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-5 h-5 text-purple-600" />
-                <span className="font-medium text-gray-900">Unlock Premium Features</span>
-              </div>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li>• Copy HTML code to clipboard</li>
-                <li>• Create up to 100+ buttons</li>
-                <li>• Advanced customization options</li>
-                <li>• Priority support</li>
-              </ul>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-              >
-                Maybe Later
-              </button>
-              <button
-                onClick={() => {
-                  setShowUpgradeModal(false);
-                  // Navigate to pricing/upgrade page
-                  window.open('/profile', '_blank');
-                }}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105 shadow-md"
-              >
-                Upgrade Now
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

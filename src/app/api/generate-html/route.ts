@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import dbConnect from '@/lib/db';
-import User from '@/models/User';
 
 // Helper function to format prompt for ChatGPT to preserve structure
 function formatPromptForChatGPT(prompt: string): string {
@@ -33,39 +30,12 @@ function formatPromptForChatGPT(prompt: string): string {
     return line;
   });
   
-
-  
   return formattedLines.join('\n');
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    await dbConnect();
-    
-    const user = await User.findOne({ clerkId: userId });
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Get user subscription details
-    const subscriptionDetails = await user.getSubscriptionDetails();
-    
-    // Check if user is on free plan
-    if (subscriptionDetails.plan === 'free') {
-      return NextResponse.json({ 
-        error: 'Copy feature is not available on the free plan',
-        requiresUpgrade: true,
-        userPlan: 'free'
-      }, { status: 403 });
-    }
-
-    // If user has premium plan, generate and return HTML
+    // Generate HTML for any user without authentication or subscription checks
     const requestData = await request.json();
     const {
       text,
@@ -87,7 +57,7 @@ export async function POST(request: NextRequest) {
     } = requestData;
 
     // Validate required fields
-    if (!text || !backgroundColor || !textColor || !fontSize || !padding || position === undefined || !aiProvider) {
+    if (!text || !backgroundColor || !textColor || !fontSize || padding === undefined || position === undefined || !aiProvider) {
       return NextResponse.json({ error: 'Missing required button configuration' }, { status: 400 });
     }
 
@@ -143,7 +113,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       htmlCode,
-      userPlan: subscriptionDetails.plan,
       message: 'HTML code generated successfully'
     });
 

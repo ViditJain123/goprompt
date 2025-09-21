@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
-import Subscription from '@/models/Subscription';
 
 export async function GET() {
   try {
@@ -13,11 +12,9 @@ export async function GET() {
     
     // Test basic operations
     const userCount = await User.countDocuments();
-    const subscriptionCount = await Subscription.countDocuments();
     
     // Test collection access
     const testUser = await User.findOne().limit(1);
-    const testSubscription = await Subscription.findOne().limit(1);
     
     const totalTime = Date.now() - startTime;
     
@@ -32,10 +29,6 @@ export async function GET() {
           users: {
             count: userCount,
             accessible: !!testUser || userCount === 0,
-          },
-          subscriptions: {
-            count: subscriptionCount,
-            accessible: !!testSubscription || subscriptionCount === 0,
           },
         },
       },
